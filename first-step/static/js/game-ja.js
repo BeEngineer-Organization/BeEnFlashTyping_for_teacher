@@ -147,13 +147,14 @@ document.addEventListener("DOMContentLoaded",function() {
             if (panel) {
                 panel.classList.remove("active","faded");
                 panel.style.animation = "none";
+                panel.style.display = 'flex'
             }    
         }
+        panelContainer.style.height = '110vh'
         startFlag = 3
-        // resultIndicate();  
         resultSection.style.display = "flex";
         window.scrollTo({
-            top: 100,      // 縦スクロールの位置
+            top: 450,      // 縦スクロールの位置
             left: 0,     // 横スクロールの位置（通常は 0 のままでOK）
             behavior: "smooth"
         })
@@ -182,7 +183,7 @@ document.addEventListener("DOMContentLoaded",function() {
                 untypedKana.textContent = "";
                 current += 1;
                 wordCountText.textContent = current;
-                if(current == wordLength){
+                if(current == 2 ){
                     // ゲームの終了
                     processEndGame()
                 }
