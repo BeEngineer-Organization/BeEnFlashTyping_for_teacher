@@ -232,12 +232,13 @@ input {
 }
 
 #word-meanings {
+  display: none;
   margin: 0 auto;
   width: 40%;
   min-width: 300px;
 }
 
-.center {
+.meaning-heading {
   text-align: center;
 }
 

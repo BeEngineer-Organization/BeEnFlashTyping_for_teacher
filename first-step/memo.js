@@ -6,6 +6,7 @@ document.addEventListener("DOMContentLoaded",function() {
     let typeCount = 0;
     let current = 0;
     let letterCount= 0;
+    // 小変更＋追加
     let typedKana;
     let untypedKana;
     let typedEn;
@@ -16,7 +17,6 @@ document.addEventListener("DOMContentLoaded",function() {
     const infoBox = document.getElementById("info");
     const panelContainer = document.getElementsByClassName("panel-container")[0];
     const wordCountText = document.getElementById("WordCount");
-    document.getElementById('wordLength').textContent = `/${wordLength}`
     const missMountText = document.getElementById("missMount");
     const timeText = document.getElementById("timeText");
     const otherResult = document.getElementById("other-result");
@@ -47,6 +47,7 @@ document.addEventListener("DOMContentLoaded",function() {
         timeoutID = setTimeout(displayTime, 10);
     }
 
+    //ライブラリ用変更
     function wordObjListMake(data){
         const lines = data.split("\n")
         shuffleArray(lines)
@@ -57,7 +58,7 @@ document.addEventListener("DOMContentLoaded",function() {
             )
         }
     }
-
+    // 大変更
     function createPanels() {
         panelContainer.innerHTML = "";
         for (let i = 0; i < wordLength ; i++) {
@@ -69,23 +70,27 @@ document.addEventListener("DOMContentLoaded",function() {
             const untypedKana = document.createElement("span");
             const typedEn = document.createElement("span");
             const untypedEn = document.createElement("span");
-
             
             jpWord.id = "jp_word"
-            typedKana.id = "kana_typed-"+i
-            untypedKana.id = "kana_untyped-"+i
-            typedEn.id = "en_typed-"+i
-            untypedEn.id = "en_untyped-"+i
-            typedKana.className = "typed"
-            untypedKana.className = "untyped"
-            typedEn.className = "typed"
-            untypedEn.className = "untyped" 
-            panel.className = "panel";
-            panel.id = "panel-" + i;
-
             jpWord.textContent = wordObjList[i].example
+
+            typedKana.id = "kana_typed-"+i
+            typedKana.className = "typed"
+
+            untypedKana.id = "kana_untyped-"+i
+            untypedKana.className = "untyped"
             untypedKana.textContent = wordObjList[i].kana.untyped;
+
+            typedEn.id = "en_typed-"+i
+            typedEn.className = "typed"
+
+            untypedEn.id = "en_untyped-"+i
+            untypedEn.className = "untyped"
             untypedEn.textContent = wordObjList[i].roman.untyped
+
+            panel.id = "panel-" + i;
+            panel.className = "panel";
+
             letterCount += wordObjList[i].roman.all.length;
             
             kanaBox.appendChild(typedKana)
@@ -101,7 +106,7 @@ document.addEventListener("DOMContentLoaded",function() {
             panelContainer.appendChild(panel);
             panelContainer.classList.add('panel-container-play')
         }
-        //後半部分は消しておく。
+        // 後半部分は消しておく。
         for(let i = 10;i < wordLength;i++){
             document.getElementById(`panel-${i}`).style.display = 'none'
         }
@@ -119,6 +124,7 @@ document.addEventListener("DOMContentLoaded",function() {
         nextPanel.classList.add("active")
     }
 
+    // 追加
     function secondFase(){
         for(let i = 0;i < wordLength/2;i++){
             document.getElementById(`panel-${i}`).style.display = 'none'
@@ -143,6 +149,7 @@ document.addEventListener("DOMContentLoaded",function() {
             await fetch(`csv/word-ja.csv`).then(response => response.text()).then(data => wordObjListMake(data))
             displayTime();
             createPanels();
+            // 日本語用に変更
             typedKana = document.getElementById(`kana_typed-${current}`);
             untypedKana = document.getElementById(`kana_untyped-${current}`);
             typedEn = document.getElementById(`en_typed-${current}`);
@@ -150,6 +157,7 @@ document.addEventListener("DOMContentLoaded",function() {
         },3000);
     }
 
+    // ライブラリ用に変更
     function inputCheck(key){
         // Wordオブジェクトのtypedメソッド→正しい文字か、その文字が終了したかを判断できる
         const { isMiss, isFinish } = wordObjList[current].typed(key);
@@ -203,6 +211,7 @@ document.addEventListener("DOMContentLoaded",function() {
         otherResult.textContent = `合計入力文字数（ミスを含む):${typeCount}`;
         resultSection.style.display = "flex";
         // 全パネルのハイライトを消す
+        //全パネルを表示する機能を追加
         for (let i = 0; i < wordLength; i++) {
             const panel = document.getElementById("panel-" + i);
             if (panel) {
@@ -211,6 +220,7 @@ document.addEventListener("DOMContentLoaded",function() {
                 panel.style.display = 'flex'
             }    
         }
+        //大きさ変更、スクロール変更
         panelContainer.style.height = '110vh'
         startFlag = 2
         window.scrollTo({
@@ -224,7 +234,6 @@ document.addEventListener("DOMContentLoaded",function() {
         if(startFlag == 0 && event.key == " "){
             processStartGame()
         }
-        
         else if(startFlag == 1 && event.key.length < 2 && event.key.match(/^[a-zA-Z0-9!-/:-@¥[-`{-~\s]*$/)){
             inputCheck(event.key);
         }else if(startFlag == 2 && (event.key =="Enter" || event.key == "Escape")){
