@@ -1,6 +1,6 @@
 document.addEventListener("DOMContentLoaded",() => {
     let timeoutID;
-    let startFlag = 0; // 0→開始前、1→ゲーム中、2→終了
+    let startFlag = 0; // 0→開始前、1→開始待機、2→ゲーム中、3→終了
     let startTime;
     let missTypeCount = 0;
     let typeCount = 0;
@@ -52,9 +52,9 @@ document.addEventListener("DOMContentLoaded",() => {
     }
     
     function displayTime() {
-        const currentTime = new Date(Date.now() - startTime);
-        const s = String(parseInt(currentTime.getMinutes()) * 60 + parseInt(currentTime.getSeconds())).padStart(2, "0");
-        const ms = String(currentTime.getMilliseconds()).padStart(3, "0");
+        const currentTime = Date.now() - startTime;
+        const s = String(Math.floor(currentTime / 1000)).padStart(2, "0");
+        const ms = String(currentTime % 1000).padStart(3, "0");
         timeText.textContent = `${s}.${ms}`;
         timeoutID = setTimeout(displayTime, 10);
     }    
@@ -87,7 +87,7 @@ document.addEventListener("DOMContentLoaded",() => {
 
     function highlightCurrentPanel() {
         let currentPanel = document.getElementById(`panel-${current-1}`);
-        let nextPanel = document.getElementById(`panel-${(current)}`)
+        let nextPanel = document.getElementById(`panel-${current}`)
         
         currentPanel.classList.remove("active");
         currentPanel.classList.add("faded");
@@ -103,10 +103,13 @@ document.addEventListener("DOMContentLoaded",() => {
             }, j*1000)
         }
         setTimeout(async ()=> {
-            startFlag = 1;
+            startFlag = 2;
             infoBox.textContent = "";
-            await fetch(`csv/word-${level}.csv`).then(response => response.text()).then(data => wordObjListMake(data))
+            await fetch(`csv/word-${level}.csv`)
+                .then(response => response.text())
+                .then(data => wordObjListMake(data))
             createPanels();
+            console.log('実行')
             startSound.currentTime = 0;
             startSound.play();
             startTime = Date.now();
@@ -167,7 +170,7 @@ document.addEventListener("DOMContentLoaded",() => {
             const panel = document.getElementById("panel-" + i);
             panel.classList.remove("active","faded");
         }
-        startFlag = 2
+        startFlag = 3
         window.scrollTo({
             top: 100,      // 縦スクロールの位置
             left: 0,     // 横スクロールの位置（通常は 0 のままでOK）
@@ -181,7 +184,7 @@ document.addEventListener("DOMContentLoaded",() => {
     let radioInput = document.querySelector(".active-level input");
     let level = radioInput.value;
 
-    function handleLevenChange(newRadioInput){
+    function handleLevelChange(newRadioInput){
         //今まで選択していたradioボタンと異なれば
         if(radioInput !== newRadioInput){
             level = newRadioInput.value;
@@ -193,17 +196,19 @@ document.addEventListener("DOMContentLoaded",() => {
 
     levelBtns.forEach(element => {
         element.querySelector("input").addEventListener("click",(event) => {
-            handleLevenChange(event.target)
+            handleLevelChange(event.target)
         });
     });
 
     window.addEventListener("keydown", (event) => {
         if(startFlag == 0 && event.key == " "){
+            startFlag = 1
             processStartGame()
         }
-        else if(startFlag == 1 && event.key.length == 1 && event.key.match(/^[a-zA-Z0-9!-/:-@¥[-`{-~\s]*$/)){
+        else if(startFlag == 2 && event.key.length == 1 && event.key.match(/^[a-zA-Z0-9!-/:-@\[-`{-~\s]*$/)){
             inputCheck(event.key);
-        }else if(startFlag == 2 && (event.key =="Enter" || event.key == "Escape")){
+        }
+        else if(startFlag == 3 && (event.key =="Enter" || event.key == "Escape")){
             this.location.reload()
         }
     })
