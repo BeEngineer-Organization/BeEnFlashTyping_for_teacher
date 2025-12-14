@@ -1,6 +1,6 @@
 document.addEventListener("DOMContentLoaded",function() {
     let timeoutID;
-    let startFlag = 0; // 0→開始前、１→ゲーム中、３→終了
+    let startFlag = 0; // 0→開始前、1→開始処理中、2→ゲーム中、3→終了
     let startTime;
     let missTypeCount = 0;
     let typeCount = 0;
@@ -119,7 +119,7 @@ document.addEventListener("DOMContentLoaded",function() {
         nextPanel.classList.add("active")
     }
 
-    function secondFase(){
+    function secondPhase(){
         for(let i = 0;i < wordLength/2;i++){
             document.getElementById(`panel-${i}`).style.display = 'none'
             document.getElementById(`panel-${i+10}`).style.display = 'flex'
@@ -135,7 +135,7 @@ document.addEventListener("DOMContentLoaded",function() {
             }, j*1000)
         }
         setTimeout(async ()=> {
-            startFlag = 1;
+            startFlag = 2;
             infoBox.textContent = "";
             startTime = Date.now();
             startSound.currentTime = 0;
@@ -179,7 +179,7 @@ document.addEventListener("DOMContentLoaded",function() {
                     untypedEn = document.getElementById(`en_untyped-${current}`);
                     
                     if(current == wordLength/2){
-                        secondFase()
+                        secondPhase()
                     }
                 }
             }
@@ -207,12 +207,11 @@ document.addEventListener("DOMContentLoaded",function() {
             const panel = document.getElementById("panel-" + i);
             if (panel) {
                 panel.classList.remove("active","faded");
-                panel.style.animation = "none";
                 panel.style.display = 'flex'
             }    
         }
         panelContainer.style.height = '110vh'
-        startFlag = 2
+        startFlag = 3
         window.scrollTo({
             top: 450,      // 縦スクロールの位置
             left: 0,     // 横スクロールの位置（通常は 0 のままでOK）
@@ -222,12 +221,14 @@ document.addEventListener("DOMContentLoaded",function() {
 
     window.addEventListener("keydown", async (event) => {
         if(startFlag == 0 && event.key == " "){
+            startFlag = 1
             processStartGame()
         }
         
-        else if(startFlag == 1 && event.key.length < 2 && event.key.match(/^[a-zA-Z0-9!-/:-@¥[-`{-~\s]*$/)){
+        else if(startFlag == 2 && event.key.length < 2 && event.key.match(/^[a-zA-Z0-9!-/:-@¥[-`{-~\s]*$/)){
             inputCheck(event.key);
-        }else if(startFlag == 2 && (event.key =="Enter" || event.key == "Escape")){
+        }
+        else if(startFlag == 3 && (event.key =="Enter" || event.key == "Escape")){
             this.location.reload()
         }
     })
